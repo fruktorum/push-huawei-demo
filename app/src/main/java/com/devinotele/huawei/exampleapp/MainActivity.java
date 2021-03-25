@@ -29,10 +29,10 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 
-import com.devinotele.devinosdk.sdk.DevinoLogsCallback;
-import com.devinotele.devinosdk.sdk.DevinoSdk;
 import com.devinotele.huawei.exampleapp.network.RetrofitHelper;
 import com.devinotele.huawei.exampleapp.util.BriefTextWatcher;
+import com.devinotele.huaweidevinosdk.sdk.DevinoLogsCallback;
+import com.devinotele.huaweidevinosdk.sdk.DevinoSdk;
 import com.huawei.agconnect.config.AGConnectServicesConfig;
 import com.huawei.hms.aaid.HmsInstanceId;
 import com.huawei.hms.common.ApiException;
@@ -154,7 +154,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case R.id.send_push:
-              /*  retrofitHelper.sendPushWithDevino(
+                /*retrofitHelper.sendPushWithDevino(
                         FirebaseInstanceId.getInstance(),
                         switchPicture.isChecked(),
                         switchSound.isChecked(),

@@ -5,7 +5,7 @@ import android.annotation.SuppressLint;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.devinotele.devinosdk.sdk.DevinoLogsCallback;
+import com.devinotele.huaweidevinosdk.sdk.DevinoLogsCallback;
 import com.huawei.hms.aaid.HmsInstanceId;
 import com.huawei.hms.common.ApiException;
 
