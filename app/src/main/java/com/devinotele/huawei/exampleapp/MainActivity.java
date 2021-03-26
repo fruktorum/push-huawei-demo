@@ -7,7 +7,6 @@ import android.content.ClipboardManager;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.PersistableBundle;
 import android.telephony.PhoneNumberUtils;
 import android.text.Editable;
@@ -59,15 +58,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private final int REQUEST_CODE_START_UPDATES = 13;
     private final int REQUEST_CODE_OTHER = 17;
 
-    private Handler mainHandler;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
-
-        mainHandler = new Handler(getMainLooper());
 
         setUpViews();
         showLogs(false);
@@ -154,12 +149,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case R.id.send_push:
-                /*retrofitHelper.sendPushWithDevino(
-                        FirebaseInstanceId.getInstance(),
+                retrofitHelper.sendPushWithDevino(
+                        AGConnectServicesConfig.fromContext(MainActivity.this),
+                        HmsInstanceId.getInstance(MainActivity.this),
                         switchPicture.isChecked(),
                         switchSound.isChecked(),
                         switchDeeplink.isChecked()
-                );*/
+                );
                 break;
 
             case R.id.send_geo:

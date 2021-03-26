@@ -6,10 +6,10 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.devinotele.huaweidevinosdk.sdk.DevinoLogsCallback;
+import com.huawei.agconnect.config.AGConnectServicesConfig;
 import com.huawei.hms.aaid.HmsInstanceId;
 import com.huawei.hms.common.ApiException;
 
-import java.util.Arrays;
 import java.util.HashMap;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -18,70 +18,25 @@ import io.reactivex.schedulers.Schedulers;
 
 public class RetrofitHelper {
 
-    private FirebaseApi firebaseApi;
     private DevinoPushApi devinoPushApi;
     private DevinoLogsCallback callback;
 
     public RetrofitHelper(DevinoLogsCallback callback) {
-        firebaseApi = RetrofitClientInstance.getRetrofitInstance().create(FirebaseApi.class);
         devinoPushApi = RetrofitClientInstance.getRetrofitInstanceForDevinoPush().create(DevinoPushApi.class);
         this.callback = callback;
     }
 
     @SuppressLint("CheckResult")
-    public void sendPush(HmsInstanceId hmsInstanceId, String agAppId, Boolean picture, Boolean sound, Boolean deepLink) {
+    public void sendPushWithDevino(AGConnectServicesConfig confg, HmsInstanceId hmsInstanceId, Boolean picture, Boolean sound, Boolean deepLink) {
         new Thread() {
             @Override
             public void run() {
                 try {
                     String tokenScope = "HCM";
-                    String token = hmsInstanceId.getToken(agAppId, tokenScope);
+                    String apAppId = confg.getString("client/app_id");
+                    String token = hmsInstanceId.getToken(apAppId, tokenScope);
 
-                    if (!TextUtils.isEmpty(token)) {
-                        String message = "Simple push";
-                        Log.d("TOKEN", token);
-
-                        HashMap<String, Object> body = new HashMap<>();
-                        HashMap<String, Object> data = new HashMap<>();
-                        data.put("title", "Devino");
-
-
-                        if (deepLink) {
-                            message += " & Button";
-                            HashMap<String, Object> button = new HashMap<>();
-                            button.put("text", "Action");
-                            button.put("deeplink", "devino://first");
-                            button.put("picture", "https://avatars.mds.yandex.net/get-pdb/163339/224697a1-db7d-4d02-a12f-aa70383fadc3/s1200");
-                            data.put("buttons", Arrays.asList(button));
-                        }
-                        if (picture) {
-                            message += " & Picture";
-                            data.put("icon", "https://avatars.mds.yandex.net/get-pdb/163339/224697a1-db7d-4d02-a12f-aa70383fadc3/s1200");
-                        }
-
-                        data.put("body", message);
-                        body.put("to", token);
-                        body.put("data", data);
-                        firebaseApi.sendPush(body)
-                                .subscribeOn(Schedulers.newThread())
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe(
-                                        object -> System.out.println(object.toString()),
-                                        Throwable::printStackTrace);
-
-                    }
-                } catch (ApiException e) {
-                }
-            }
-        }.start();
-    }
-
-   /* @SuppressLint("CheckResult")
-    public void sendPushWithDevino(FirebaseInstanceId firebaseInstanceId, Boolean picture, Boolean sound, Boolean deepLink) {
-        firebaseInstanceId.getInstanceId()
-                .addOnCompleteListener(task -> {
-                    if (!task.isSuccessful()) { return; }
-                    String token = task.getResult().getToken();
+                    if (!TextUtils.isEmpty(token)) return;
                     String message = "Simple push";
                     Log.d("Devino", token);
 
@@ -108,7 +63,7 @@ public class RetrofitHelper {
                     android.put("tag", "tag");
                     android.put("collapseKey", "type_a");
 
-                    if(deepLink) {
+                    if (deepLink) {
                         android.put("action", "devino://first");
                         message += " & Button";
                         HashMap<String, Object> button1 = new HashMap<>();
@@ -117,7 +72,7 @@ public class RetrofitHelper {
                         android.put("buttons", new HashMap[]{button1});
                     }
 
-                    if(picture) {
+                    if (picture) {
                         message += " & Picture";
                         android.put("icon", "https://avatars.mds.yandex.net/get-pdb/163339/224697a1-db7d-4d02-a12f-aa70383fadc3/s1200");
                     }
@@ -137,59 +92,16 @@ public class RetrofitHelper {
                                     },
                                     error -> error.printStackTrace()
                             );
-                });
-    }*/
+                } catch (ApiException ex) {
+                    try {
+                        callback.onMessageLogged("Send Push Error" + ex.getMessage());
+                    } catch (Throwable error) {
+                        error.printStackTrace();
+                    }
+                }
+            }
+        }.start();
 
-  /*  @SuppressLint("CheckResult")
-    public void sendPushWithDevino(FirebaseInstanceId firebaseInstanceId, String title, String text) {
-        firebaseInstanceId.getInstanceId()
-                .addOnCompleteListener(task -> {
-                    if (!task.isSuccessful()) { return; }
-                    String token = task.getResult().getToken();
+    }
 
-                    HashMap<String, Object> body = new HashMap<>();
-
-                    body.put("from", 12);
-                    body.put("validity", 111);
-                    body.put("to", token);
-                    body.put("title", title);
-                    body.put("text", text);
-                    body.put("badge", 0);
-                    body.put("priority", "HIGH");
-                    body.put("silentPush", false);
-
-                    HashMap<String, Object> options = new HashMap<>();
-                    options.put("title", title);
-                    options.put("body", text);
-                    options.put("icon", "https://avatars.mds.yandex.net/get-pdb/163339/224697a1-db7d-4d02-a12f-aa70383fadc3/s1200");
-                    body.put("options", options);
-
-                    HashMap<String, Object> android = new HashMap<>();
-
-                    android.put("icon", "icon");
-                    android.put("action", "action");
-                    android.put("iconColor", "iconColor");
-                    android.put("sound", "sound");
-                    android.put("androidChannelId", "androidChannelId");
-                    android.put("tag", "tag");
-                    android.put("collapseKey", "type_a");
-
-//                    HashMap<String, Object> button1 = new HashMap<>();
-//
-//                    android.put("buttons", new HashMap[]{button1});
-                    body.put("android", android);
-
-                    HashMap<String, Object>[] arr = new HashMap[1];
-                    arr[0] = body;
-                    devinoPushApi.sendPush(arr)
-                            .subscribeOn(Schedulers.newThread())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(
-                                    object -> {
-                                        System.out.println(object.toString());
-                                        callback.onMessageLogged(object.toString());
-                                    },
-                                    Throwable::printStackTrace);
-                });
-    }*/
 }
