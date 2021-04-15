@@ -28,7 +28,7 @@ android {
             buildConfigField "String", "DEVINO_API_KEY", "\"eeed34a7-d479-4789-9b61-a227becfaca3\""
             buildConfigField "String", "DEVINO_APP_PUSH_KEY", "\"key\""
             buildConfigField "String", "DEVINO_SEND_API_KEY", "\"Key eeed34a7-d479-4789-9b61-a227becfaca3\""
-            buildConfigField "String", "DEVINO_PUSH_SERVICE_URL", "\"https://integrationapi.net/\""
+            buildConfigField "String", "DEVINO_PUSH_SERVICE_URL", "\"http://integrationapi.net/\""
             buildConfigField "String", "DEVINO_APP_ID", "\"12\""
         }
         release {
@@ -69,9 +69,7 @@ dependencies {
     implementation 'com.huawei.hms:location:5.0.5.300'
     implementation 'com.huawei.agconnect:agconnect-core:1.4.0.300'
 
-
-    implementation 'com.github.bumptech.glide:glide:4.9.0'
-    annotationProcessor 'com.github.bumptech.glide:compiler:4.9.0'
+    implementation 'com.squareup.picasso:picasso:2.71828'
 
     implementation(name:'push-huawei-sdk-release-1.0.0', ext:'aar')
 }

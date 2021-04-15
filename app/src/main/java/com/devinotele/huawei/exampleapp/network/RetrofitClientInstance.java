@@ -21,7 +21,7 @@ class RetrofitClientInstance {
             httpClient.addInterceptor(chain -> {
                 Request original = chain.request();
                 Request request = original.newBuilder()
-                        .header("Authotization", BuildConfig.DEVINO_SEND_API_KEY)
+                        .header("Authorization", BuildConfig.DEVINO_SEND_API_KEY)
                         .header("Content-Type", "application/json")
                         .method(original.method(), original.body())
                         .build();
