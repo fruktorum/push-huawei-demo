@@ -5,8 +5,9 @@ import android.annotation.SuppressLint;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.devinotele.huawei.exampleapp.BuildConfig;
 import com.devinotele.huaweidevinosdk.sdk.DevinoLogsCallback;
-import com.huawei.agconnect.config.AGConnectServicesConfig;
+import com.huawei.agconnect.AGConnectOptions;
 import com.huawei.hms.aaid.HmsInstanceId;
 import com.huawei.hms.common.ApiException;
 
@@ -27,7 +28,7 @@ public class RetrofitHelper {
     }
 
     @SuppressLint("CheckResult")
-    public void sendPushWithDevino(AGConnectServicesConfig confg, HmsInstanceId hmsInstanceId, Boolean picture, Boolean sound, Boolean deepLink) {
+    public void sendPushWithDevino(AGConnectOptions confg, HmsInstanceId hmsInstanceId, Boolean picture, Boolean sound, Boolean deepLink) {
         new Thread() {
             @Override
             public void run() {
@@ -42,8 +43,8 @@ public class RetrofitHelper {
 
                     HashMap<String, Object> body = new HashMap<>();
                     body.put("platform", "huawei");
-                    body.put("from", 12);
-                    body.put("validity", 111);
+                    body.put("from", BuildConfig.DEVINO_APP_ID);
+                    body.put("validity", 3600);
                     body.put("to", token);
                     body.put("title", "Devino Demo");
                     body.put("badge", 0);
