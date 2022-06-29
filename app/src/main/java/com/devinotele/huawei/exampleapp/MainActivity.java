@@ -21,20 +21,20 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.devinotele.huawei.exampleapp.network.RetrofitHelper;
+import com.devinotele.huawei.exampleapp.util.BriefTextWatcher;
+import com.devinotele.huaweidevinosdk.sdk.DevinoLogsCallback;
+import com.devinotele.huaweidevinosdk.sdk.DevinoSdk;
+import com.huawei.agconnect.AGConnectOptionsBuilder;
+import com.huawei.hms.aaid.HmsInstanceId;
+import com.huawei.hms.common.ApiException;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
-
-import com.devinotele.huawei.exampleapp.network.RetrofitHelper;
-import com.devinotele.huawei.exampleapp.util.BriefTextWatcher;
-import com.devinotele.huaweidevinosdk.sdk.DevinoLogsCallback;
-import com.devinotele.huaweidevinosdk.sdk.DevinoSdk;
-import com.huawei.agconnect.config.AGConnectServicesConfig;
-import com.huawei.hms.aaid.HmsInstanceId;
-import com.huawei.hms.common.ApiException;
 
 import static com.devinotele.huawei.exampleapp.util.Util.checkEmail;
 
@@ -150,7 +150,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             case R.id.send_push:
                 retrofitHelper.sendPushWithDevino(
-                        AGConnectServicesConfig.fromContext(MainActivity.this),
+                        new AGConnectOptionsBuilder().build(this),
                         HmsInstanceId.getInstance(MainActivity.this),
                         switchPicture.isChecked(),
                         switchSound.isChecked(),
@@ -258,7 +258,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 public void run() {
                     try {
                         String tokenScope = "HCM";
-                        String apAppId = AGConnectServicesConfig.fromContext(MainActivity.this).getString("client/app_id");
+                        String apAppId = new AGConnectOptionsBuilder()
+                                .build(MainActivity.this)
+                                .getString("client/app_id");
                         String token = HmsInstanceId.getInstance(MainActivity.this).getToken(apAppId, tokenScope);
 
                         if (!TextUtils.isEmpty(token)) {
@@ -272,7 +274,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             logsCallback.onMessageLogged("Push Kit Error: " + ex.getMessage());
                         } catch (Throwable error) {
                             error.printStackTrace();
-                            return;
                         }
                     }
 
