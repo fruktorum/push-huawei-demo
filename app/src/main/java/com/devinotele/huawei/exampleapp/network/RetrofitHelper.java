@@ -2,15 +2,20 @@ package com.devinotele.huawei.exampleapp.network;
 
 
 import android.annotation.SuppressLint;
+import android.content.ContentResolver;
+import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 
 import com.devinotele.huawei.exampleapp.BuildConfig;
+import com.devinotele.huawei.exampleapp.R;
 import com.devinotele.huaweidevinosdk.sdk.DevinoLogsCallback;
+import com.devinotele.huaweidevinosdk.sdk.DevinoSdk;
 import com.huawei.agconnect.AGConnectOptions;
 import com.huawei.hms.aaid.HmsInstanceId;
 import com.huawei.hms.common.ApiException;
 
+import java.util.Arrays;
 import java.util.HashMap;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -19,8 +24,8 @@ import io.reactivex.schedulers.Schedulers;
 
 public class RetrofitHelper {
 
-    private DevinoPushApi devinoPushApi;
-    private DevinoLogsCallback callback;
+    private final DevinoPushApi devinoPushApi;
+    private final DevinoLogsCallback callback;
 
     public RetrofitHelper(DevinoLogsCallback callback) {
         devinoPushApi = RetrofitClientInstance.getRetrofitInstanceForDevinoPush().create(DevinoPushApi.class);
@@ -28,18 +33,28 @@ public class RetrofitHelper {
     }
 
     @SuppressLint("CheckResult")
-    public void sendPushWithDevino(AGConnectOptions confg, HmsInstanceId hmsInstanceId, Boolean picture, Boolean sound, Boolean deepLink) {
+    public void sendPushWithDevino(
+            AGConnectOptions confg,
+            HmsInstanceId hmsInstanceId,
+            Boolean isPicture,
+            Boolean isSound,
+            Boolean isDeepLink,
+            Boolean isAction,
+            Context context
+    ) {
         new Thread() {
             @Override
             public void run() {
                 try {
                     String tokenScope = "HCM";
                     String apAppId = confg.getString("client/app_id");
+                    Log.d("DevinoPush", "apAppId = " + apAppId);
                     String token = hmsInstanceId.getToken(apAppId, tokenScope);
+                    Log.d("DevinoPush", "token = " + token);
 
                     if (TextUtils.isEmpty(token)) return;
                     String message = "Simple push";
-                    Log.d("Devino", token);
+                    Log.d("DevinoPush", token);
 
                     HashMap<String, Object> body = new HashMap<>();
                     body.put("platform", "huawei");
@@ -63,8 +78,11 @@ public class RetrofitHelper {
                     android.put("tag", "tag");
                     android.put("collapseKey", "type_a");
 
+                    if (isAction) {
+                        android.put("action", "devino://first_screen");
+                    }
 
-                    if (deepLink) {
+                    if (isDeepLink) {
                         android.put("action", "devino://first_screen");
                         message += " & Button";
                         HashMap<String, Object> button1 = new HashMap<>();
@@ -73,9 +91,22 @@ public class RetrofitHelper {
                         android.put("buttons", new HashMap[]{button1});
                     }
 
-                    if (picture) {
+                    if (isPicture) {
                         message += " & Picture";
                         android.put("image", "https://cdn.ren.tv/cache/960x540/media/img/14/46/144659e6d12aa348c7eae2170d1d6e04f3d2d1da.jpg");
+                    }
+
+                    if (isSound) {
+                        String sound = ContentResolver.SCHEME_ANDROID_RESOURCE
+                                + "://"
+                                + context.getPackageName()
+                                + "/" + R.raw.push_sound;
+                        Log.d("DevinoPush", "sound = " + sound);
+                        android.put("sound", sound);
+                        // or use method setCustomSound(sound):
+                        // DevinoSdk.getInstance().setCustomSound(Uri.parse(sound));
+                    } else {
+                        DevinoSdk.getInstance().useDefaultSound();
                     }
 
                     body.put("android", android);
@@ -89,13 +120,16 @@ public class RetrofitHelper {
                             .subscribe(
                                     object -> {
                                         callback.onMessageLogged(object.toString());
-                                        System.out.println(object.toString());
+                                        System.out.println(object);
                                     },
-                                    error -> error.printStackTrace()
+                                    Throwable::printStackTrace
                             );
                 } catch (ApiException ex) {
                     try {
-                        callback.onMessageLogged("Send Push Error" + ex.getMessage());
+                        callback.onMessageLogged("Send Push Error: " + ex.getMessage());
+                        Log.d("DevinoPush", "Send Push Error: " + ex.getMessage());
+                        Log.d("DevinoPush", "Send Push Error: " + Arrays.toString(ex.getStackTrace()));
+                        Log.d("DevinoPush", "Send Push Error: " + Arrays.toString(ex.getStackTrace()));
                     } catch (Throwable error) {
                         error.printStackTrace();
                     }
