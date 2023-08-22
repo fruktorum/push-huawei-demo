@@ -25,7 +25,9 @@ public class RetrofitHelper {
     private final DevinoLogsCallback callback;
 
     public RetrofitHelper(DevinoLogsCallback callback) {
-        devinoPushApi = RetrofitClientInstance.getRetrofitInstanceForDevinoPush().create(DevinoPushApi.class);
+        devinoPushApi = RetrofitClientInstance
+                .getRetrofitInstanceForDevinoPush()
+                .create(DevinoPushApi.class);
         this.callback = callback;
     }
 
@@ -64,24 +66,23 @@ public class RetrofitHelper {
                     body.put("priority", "HIGH");
                     body.put("silentPush", false);
 
-                    HashMap<String, Object> options = new HashMap<>();
-                    body.put("options", options);
+                    HashMap<String, Object> customData = new HashMap<>();
+                    customData.put("login", "loginValue");
+                    body.put("customData", customData);
 
                     HashMap<String, Object> android = new HashMap<>();
-
-                    android.put("action", "devino://default-push-action");
-                    android.put("iconColor", "iconColor");
-                    android.put("sound", "sound");
-                    android.put("androidChannelId", "androidChannelId");
-                    android.put("tag", "tag");
-                    android.put("collapseKey", "type_a");
 
                     if (isAction) {
                         android.put("action", "devino://first_screen");
                     }
 
+                    android.put("androidChannelId", "androidChannelId");
+                    android.put("tag", "tag");
+                    android.put("collapseKey", "type_a");
+                    android.put("iconColor", "#0000FF");
+                    android.put("smallIcon", "ic_baseline_android_24");
+
                     if (isDeepLink) {
-                        android.put("action", "devino://first_screen");
                         message += " & Button";
                         HashMap<String, Object> button1 = new HashMap<>();
                         button1.put("caption", "ACTION");
@@ -91,7 +92,10 @@ public class RetrofitHelper {
 
                     if (isPicture) {
                         message += " & Picture";
-                        android.put("image", "https://cdn.ren.tv/cache/960x540/media/img/14/46/144659e6d12aa348c7eae2170d1d6e04f3d2d1da.jpg");
+                        android.put(
+                                "image",
+                                "https://cdn.ren.tv/cache/960x540/media/img/14/46/144659e6d12aa348c7eae2170d1d6e04f3d2d1da.jpg"
+                        );
                     }
 
                     if (isSound) {
@@ -124,14 +128,13 @@ public class RetrofitHelper {
                             );
                 } catch (ApiException ex) {
                     try {
-                        callback.onMessageLogged("Send Push Error: " + ex.getMessage());
-                        Log.d("DevinoPush", "Send Push Error: " + ex.getMessage());
+                        callback.onMessageLogged("Demo Send Push Error: " + ex.getMessage());
+                        Log.d("DevinoPush", "Demo Send Push Error: " + ex.getMessage());
                     } catch (Throwable error) {
                         error.printStackTrace();
                     }
                 }
             }
         }.start();
-
     }
 }
