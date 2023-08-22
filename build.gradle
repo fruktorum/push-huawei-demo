@@ -7,7 +7,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:7.2.2'
-        classpath 'com.huawei.agconnect:agcp:1.4.2.300'
+        classpath 'com.huawei.agconnect:agcp:1.6.0.300'
         classpath("androidx.navigation:navigation-safe-args-gradle-plugin:2.7.0")
         classpath 'org.mockito:mockito-core:3.3.3'
     }

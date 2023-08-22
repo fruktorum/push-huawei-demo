@@ -1,6 +1,5 @@
 package com.devinotele.huawei.exampleapp.network;
 
-
 import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -15,12 +14,10 @@ import com.huawei.agconnect.AGConnectOptions;
 import com.huawei.hms.aaid.HmsInstanceId;
 import com.huawei.hms.common.ApiException;
 
-import java.util.Arrays;
 import java.util.HashMap;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
-
 
 public class RetrofitHelper {
 
@@ -49,6 +46,7 @@ public class RetrofitHelper {
                     String tokenScope = "HCM";
                     String apAppId = confg.getString("client/app_id");
                     Log.d("DevinoPush", "apAppId = " + apAppId);
+
                     String token = hmsInstanceId.getToken(apAppId, tokenScope);
                     Log.d("DevinoPush", "token = " + token);
 
@@ -128,8 +126,6 @@ public class RetrofitHelper {
                     try {
                         callback.onMessageLogged("Send Push Error: " + ex.getMessage());
                         Log.d("DevinoPush", "Send Push Error: " + ex.getMessage());
-                        Log.d("DevinoPush", "Send Push Error: " + Arrays.toString(ex.getStackTrace()));
-                        Log.d("DevinoPush", "Send Push Error: " + Arrays.toString(ex.getStackTrace()));
                     } catch (Throwable error) {
                         error.printStackTrace();
                     }
@@ -138,5 +134,4 @@ public class RetrofitHelper {
         }.start();
 
     }
-
 }

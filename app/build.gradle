@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'androidx.navigation.safeargs'
+apply plugin: "com.huawei.agconnect"
 
 static def buildTime() {
     return new Date().format("dd-MM-yyyy'T'HH-mm")
