@@ -48,7 +48,11 @@ public class RegistrationFragment extends Fragment implements View.OnClickListen
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(
+            LayoutInflater inflater,
+            ViewGroup container,
+            Bundle savedInstanceState
+    ) {
         return inflater.inflate(R.layout.fragment_registration, container, false);
     }
 
@@ -69,7 +73,7 @@ public class RegistrationFragment extends Fragment implements View.OnClickListen
         userEmail = requireView().findViewById(R.id.edt_user_email);
         apiBaseUrl = requireView().findViewById(R.id.edt_api_url);
 
-        Integer phoneValueLength = userPhone.getText().length();
+        int phoneValueLength = userPhone.getText().length();
         userPhone.setOnFocusChangeListener((v, hasFocus) -> {
             if (hasFocus) userPhone.setSelection(phoneValueLength);
         });
@@ -131,7 +135,8 @@ public class RegistrationFragment extends Fragment implements View.OnClickListen
 
     @Override
     public void onClick(View v) {
-        NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
+        NavController navController =
+                Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
         if (v.getId() == R.id.btn_registration) {
             try {
                 doRegistration(navController);

@@ -72,7 +72,11 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(
+            LayoutInflater inflater,
+            ViewGroup container,
+            Bundle savedInstanceState
+    ) {
         return inflater.inflate(R.layout.fragment_home, container, false);
     }
 
@@ -269,10 +273,13 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                         String apAppId = new AGConnectOptionsBuilder()
                                 .build(requireContext())
                                 .getString("client/app_id");
-                        String token = HmsInstanceId.getInstance(requireContext()).getToken(apAppId, tokenScope);
+                        String token = HmsInstanceId
+                                .getInstance(requireContext())
+                                .getToken(apAppId, tokenScope);
 
                         if (!TextUtils.isEmpty(token)) {
-                            ClipboardManager clipboard = (ClipboardManager) requireContext().getSystemService(CLIPBOARD_SERVICE);
+                            ClipboardManager clipboard = (ClipboardManager) requireContext()
+                                    .getSystemService(CLIPBOARD_SERVICE);
                             ClipData clip = ClipData.newPlainText("token", token);
                             clipboard.setPrimaryClip(clip);
                             requireActivity().runOnUiThread(() ->
@@ -285,7 +292,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                         }
                     } catch (ApiException ex) {
                         try {
-                            logsCallback.onMessageLogged("Copy token -> Push Kit Error: " + ex.getMessage());
+                            logsCallback.onMessageLogged(
+                                    "Copy token -> Push Kit Error: " + ex.getMessage()
+                            );
                         } catch (Throwable error) {
                             error.printStackTrace();
                         }
@@ -318,7 +327,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                 .setTitle(getString(R.string.geo_permission_missing))
                 .setMessage(getString(R.string.may_devino_permission))
                 .setPositiveButton(android.R.string.yes, (dialog, which) ->
-                        DevinoSdk.getInstance().requestGeoPermission(requireActivity(), REQUEST_CODE_SEND_GEO)
+                        DevinoSdk.getInstance().requestGeoPermission(
+                                requireActivity(), REQUEST_CODE_SEND_GEO
+                        )
                 )
                 .setNegativeButton(android.R.string.no, null)
                 .show();

@@ -36,5 +36,4 @@ class RetrofitClientInstance {
         }
         return retrofitDevino;
     }
-
 }
