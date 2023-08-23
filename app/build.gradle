@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'androidx.navigation.safeargs'
+apply plugin: "com.huawei.agconnect"
 
 static def buildTime() {
     return new Date().format("dd-MM-yyyy'T'HH-mm")
@@ -20,6 +21,14 @@ android {
     }
 
     signingConfigs {
+
+        debug {
+            storeFile file("mock_key")
+            storePassword "Mock1234"
+            keyAlias "key0"
+            keyPassword "Mock1234"
+        }
+
         release {
             storeFile file("mock_key")
             storePassword "Mock1234"
