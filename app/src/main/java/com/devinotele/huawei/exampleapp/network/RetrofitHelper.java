@@ -3,6 +3,7 @@ package com.devinotele.huawei.exampleapp.network;
 import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -94,7 +95,7 @@ public class RetrofitHelper {
                         message += " & Picture";
                         android.put(
                                 "image",
-                                "https://cdn.ren.tv/cache/960x540/media/img/14/46/144659e6d12aa348c7eae2170d1d6e04f3d2d1da.jpg"
+                                "https://cdn-icons-png.flaticon.com/512/226/226770.png"
                         );
                     }
 
@@ -106,7 +107,7 @@ public class RetrofitHelper {
                         Log.d("DevinoPush", "sound = " + sound);
                         android.put("sound", sound);
                         // or use method setCustomSound(sound):
-                        // DevinoSdk.getInstance().setCustomSound(Uri.parse(sound));
+                        DevinoSdk.getInstance().setCustomSound(Uri.parse(sound));
                     } else {
                         DevinoSdk.getInstance().useDefaultSound();
                     }

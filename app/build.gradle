@@ -13,8 +13,8 @@ android {
         applicationId "com.devinotele.huawei.exampleapp"
         minSdkVersion 23
         targetSdkVersion 33
-        versionCode 2
-        versionName "1.1"
+        versionCode 3
+        versionName "3.0.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         setProperty("archivesBaseName", applicationId + ".demo-v" + versionCode + "(" + versionName + ")-" + buildTime())
@@ -56,6 +56,7 @@ android {
             signingConfig signingConfigs.release
         }
     }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
@@ -84,9 +85,9 @@ dependencies {
     implementation 'com.huawei.hms:location:5.0.5.300'
     implementation 'com.huawei.agconnect:agconnect-core:1.6.1.300'
 
-    //implementation 'com.squareup.picasso:picasso:2.71828'
+    implementation 'com.squareup.picasso:picasso:2.71828'
 
-    implementation files('libs/push-huawei-sdk-release-1.1.0.aar')
+    implementation files('libs/push-huawei-sdk-release-3.0.0.aar')
 
     // Java language navigation component implementation
     implementation "androidx.navigation:navigation-fragment:2.5.3"
