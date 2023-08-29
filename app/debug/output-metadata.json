@@ -1,0 +1,20 @@
+{
+  "version": 3,
+  "artifactType": {
+    "type": "APK",
+    "kind": "Directory"
+  },
+  "applicationId": "com.devinotele.huawei.exampleapp",
+  "variantName": "debug",
+  "elements": [
+    {
+      "type": "SINGLE",
+      "filters": [],
+      "attributes": [],
+      "versionCode": 3,
+      "versionName": "3.0.0",
+      "outputFile": "com.devinotele.huawei.exampleapp.demo-v3(3.0.0)-29-08-2023T00-44-debug.apk"
+    }
+  ],
+  "elementType": "File"
+}

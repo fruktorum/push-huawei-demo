@@ -255,7 +255,14 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                         != PackageManager.PERMISSION_GRANTED) {
                     showGeoPermissionDialog();
                 } else
-                    DevinoSdk.getInstance().sendCurrentGeo();
+                    try {
+                        DevinoSdk.getInstance().sendCurrentGeo();
+                    } catch (Exception e) {
+                        Log.d(
+                                getString(R.string.logs_tag),
+                                getString(R.string.error_send_geo) + " " + e.getMessage()
+                        );
+                    }
             } catch (Exception e) {
                 Log.d(
                         getString(R.string.logs_tag),
@@ -324,10 +331,10 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
     private void showGeoPermissionDialog() {
         new AlertDialog.Builder(requireContext())
-                .setTitle(getString(R.string.geo_permission_missing))
+                .setTitle(getString(R.string.foreground_geo_permission_missing))
                 .setMessage(getString(R.string.may_devino_permission))
                 .setPositiveButton(android.R.string.yes, (dialog, which) ->
-                        DevinoSdk.getInstance().requestGeoPermission(
+                        DevinoSdk.getInstance().requestForegroundGeoPermission(
                                 requireActivity(), REQUEST_CODE_SEND_GEO
                         )
                 )

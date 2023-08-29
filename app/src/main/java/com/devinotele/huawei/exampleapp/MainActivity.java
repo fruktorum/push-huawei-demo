@@ -1,15 +1,27 @@
 package com.devinotele.huawei.exampleapp;
 
+import static android.Manifest.permission.ACCESS_BACKGROUND_LOCATION;
+import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
+import static android.Manifest.permission.ACCESS_FINE_LOCATION;
+import static android.Manifest.permission.POST_NOTIFICATIONS;
+
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import com.devinotele.huaweidevinosdk.sdk.DevinoLogsCallback;
-import com.devinotele.huaweidevinosdk.sdk.DevinoSdk;
+
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
+
+import com.devinotele.huaweidevinosdk.sdk.DevinoLogsCallback;
+import com.devinotele.huaweidevinosdk.sdk.DevinoSdk;
+
+import java.util.Arrays;
+
 import io.reactivex.subjects.ReplaySubject;
 
 public class MainActivity extends AppCompatActivity implements MainActivityCallback {
@@ -19,7 +31,9 @@ public class MainActivity extends AppCompatActivity implements MainActivityCallb
     private DevinoLogsCallback logsCallback;
     public String logs = "";
     public ReplaySubject<String> logsRx = ReplaySubject.create();
-    private final int REQUEST_CODE_START_UPDATES = 13;
+    private final int REQUEST_CODE_FOREGROUND_GEO = 13;
+    private final int REQUEST_CODE_BACKGROUND_GEO = 12;
+    private final int REQUEST_CODE_BACKGROUND_GEO_SEND_GEO = 10;
     private final int REQUEST_CODE_NOTIFICATION = 14;
     private final int REQUEST_CODE_NOTIFICATION_AND_GEO = 15;
     private final int REQUEST_CODE_SEND_GEO = 11;
@@ -90,51 +104,103 @@ public class MainActivity extends AppCompatActivity implements MainActivityCallb
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         switch (requestCode) {
-            case REQUEST_CODE_START_UPDATES, REQUEST_CODE_SEND_GEO -> {
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    logsCallback.onMessageLogged(getString(R.string.geo_permission_granted));
-                    startGeo();
-                    DevinoSdk.getInstance().sendCurrentGeo();
+            case REQUEST_CODE_FOREGROUND_GEO, REQUEST_CODE_SEND_GEO -> {
+                Log.d(getString(R.string.tag), "1 grantResults=" + Arrays.toString(grantResults));
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED
+                        && grantResults[1] == PackageManager.PERMISSION_GRANTED
+                ) {
+                    logsCallback.onMessageLogged(getString(R.string.foreground_geo_permission_granted));
+
+                    if (requestCode == REQUEST_CODE_SEND_GEO) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                            startGeoOrRequestBackgroundGeoPermission(REQUEST_CODE_BACKGROUND_GEO_SEND_GEO);
+                        } else {
+                            startGeo();
+                            DevinoSdk.getInstance().sendCurrentGeo();
+                        }
+                    } else {
+                        startGeoOrRequestBackgroundGeoPermission(REQUEST_CODE_BACKGROUND_GEO);
+                    }
                 } else {
-                    logsCallback.onMessageLogged(getString(R.string.geo_permission_missing));
+                    logsCallback.onMessageLogged(getString(R.string.foreground_geo_permission_missing));
                 }
             }
             case REQUEST_CODE_NOTIFICATION_AND_GEO -> {
+                Log.d(getString(R.string.tag), "2 grantResults=" + Arrays.toString(grantResults));
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED
                         && grantResults[1] == PackageManager.PERMISSION_GRANTED
+                        && grantResults[2] == PackageManager.PERMISSION_GRANTED
                 ) {
-                    logsCallback.onMessageLogged(getString(R.string.geo_permission_granted));
+                    logsCallback.onMessageLogged(getString(R.string.foreground_geo_permission_granted));
                     logsCallback.onMessageLogged(getString(R.string.notification_permission_granted));
-                    startGeo();
+                    startGeoOrRequestBackgroundGeoPermission(REQUEST_CODE_BACKGROUND_GEO);
                 }
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_DENIED
                         && grantResults[1] == PackageManager.PERMISSION_DENIED
+                        && grantResults[2] == PackageManager.PERMISSION_DENIED
                 ) {
-                    logsCallback.onMessageLogged(getString(R.string.geo_permission_missing));
+                    logsCallback.onMessageLogged(getString(R.string.foreground_geo_permission_missing));
                     logsCallback.onMessageLogged(getString(R.string.notification_permission_missing));
                 }
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED
-                        && grantResults[1] == PackageManager.PERMISSION_DENIED
+                        && grantResults[1] == PackageManager.PERMISSION_GRANTED
+                        && grantResults[2] == PackageManager.PERMISSION_DENIED
                 ) {
-                    logsCallback.onMessageLogged(getString(R.string.geo_permission_granted));
-                    startGeo();
+                    logsCallback.onMessageLogged(getString(R.string.foreground_geo_permission_granted));
+                    startGeoOrRequestBackgroundGeoPermission(REQUEST_CODE_BACKGROUND_GEO);
                     logsCallback.onMessageLogged(getString(R.string.notification_permission_missing));
                 }
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_DENIED
-                        && grantResults[1] == PackageManager.PERMISSION_GRANTED
+                if (grantResults.length > 0 && (grantResults[0] == PackageManager.PERMISSION_DENIED
+                        || grantResults[1] == PackageManager.PERMISSION_DENIED)
+                        && grantResults[2] == PackageManager.PERMISSION_GRANTED
                 ) {
-                    logsCallback.onMessageLogged(getString(R.string.geo_permission_missing));
+                    logsCallback.onMessageLogged(getString(R.string.foreground_geo_permission_missing));
                     logsCallback.onMessageLogged(getString(R.string.notification_permission_granted));
                 }
             }
             case REQUEST_CODE_NOTIFICATION -> {
+                Log.d(getString(R.string.tag), "3 grantResults=" + Arrays.toString(grantResults));
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     logsCallback.onMessageLogged(getString(R.string.notification_permission_granted));
                 } else {
                     logsCallback.onMessageLogged(getString(R.string.notification_permission_missing));
                 }
             }
+            case REQUEST_CODE_BACKGROUND_GEO -> {
+                Log.d(getString(R.string.tag), "4 grantResults=" + Arrays.toString(grantResults));
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    logsCallback.onMessageLogged(getString(R.string.background_geo_permission_granted));
+                    startGeo();
+                } else {
+                    logsCallback.onMessageLogged(getString(R.string.background_geo_permission_missing));
+                }
+            }
+            case REQUEST_CODE_BACKGROUND_GEO_SEND_GEO -> {
+                Log.d(getString(R.string.tag), "5 grantResults=" + Arrays.toString(grantResults));
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    logsCallback.onMessageLogged(getString(R.string.background_geo_permission_granted));
+                    startGeo();
+                    DevinoSdk.getInstance().sendCurrentGeo();
+                } else {
+                    logsCallback.onMessageLogged(getString(R.string.background_geo_permission_missing));
+                }
+            }
+        }
+    }
 
+    private void startGeoOrRequestBackgroundGeoPermission(int requestCode) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            new AlertDialog.Builder(this)
+                    .setTitle(getString(R.string.background_geo_permission_missing))
+                    .setMessage(getString(R.string.background_geo_permission_text))
+                    .setPositiveButton(android.R.string.yes, (dialog, which) ->
+                            DevinoSdk.getInstance().requestBackgroundGeoPermission(this, requestCode)
+                    )
+                    .setNegativeButton(android.R.string.no, null)
+                    .show();
+
+        } else {
+            startGeo();
         }
     }
 
@@ -147,12 +213,34 @@ public class MainActivity extends AppCompatActivity implements MainActivityCallb
 
     private void checkPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            DevinoSdk.getInstance().requestGeoAndNotificationPermissions(
-                    this,
-                    REQUEST_CODE_NOTIFICATION_AND_GEO
-            );
+            if (ActivityCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION)
+                    == PackageManager.PERMISSION_GRANTED
+                    && ActivityCompat.checkSelfPermission(this, ACCESS_COARSE_LOCATION)
+                    == PackageManager.PERMISSION_GRANTED
+                    && ActivityCompat.checkSelfPermission(this, POST_NOTIFICATIONS)
+                    == PackageManager.PERMISSION_GRANTED
+                    && ActivityCompat.checkSelfPermission(this, ACCESS_BACKGROUND_LOCATION)
+                    == PackageManager.PERMISSION_GRANTED
+            ) {
+                startGeo();
+            } else {
+                DevinoSdk.getInstance().requestGeoAndNotificationPermissions(
+                        this,
+                        REQUEST_CODE_NOTIFICATION_AND_GEO
+                );
+            }
         } else {
-            DevinoSdk.getInstance().requestGeoPermission(this, REQUEST_CODE_START_UPDATES);
+            if (ActivityCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION)
+                    == PackageManager.PERMISSION_GRANTED
+                    && ActivityCompat.checkSelfPermission(this, ACCESS_COARSE_LOCATION)
+                    == PackageManager.PERMISSION_GRANTED
+                    && ActivityCompat.checkSelfPermission(this, ACCESS_BACKGROUND_LOCATION)
+                    == PackageManager.PERMISSION_GRANTED
+            ) {
+                startGeo();
+            } else {
+                DevinoSdk.getInstance().requestForegroundGeoPermission(this, REQUEST_CODE_FOREGROUND_GEO);
+            }
         }
     }
 }
