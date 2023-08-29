@@ -33,6 +33,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityCallb
     public ReplaySubject<String> logsRx = ReplaySubject.create();
     private final int REQUEST_CODE_FOREGROUND_GEO = 13;
     private final int REQUEST_CODE_BACKGROUND_GEO = 12;
+    private final int REQUEST_CODE_BACKGROUND_GEO_SEND_GEO = 10;
     private final int REQUEST_CODE_NOTIFICATION = 14;
     private final int REQUEST_CODE_NOTIFICATION_AND_GEO = 15;
     private final int REQUEST_CODE_SEND_GEO = 11;
@@ -109,13 +110,16 @@ public class MainActivity extends AppCompatActivity implements MainActivityCallb
                         && grantResults[1] == PackageManager.PERMISSION_GRANTED
                 ) {
                     logsCallback.onMessageLogged(getString(R.string.foreground_geo_permission_granted));
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                        DevinoSdk.getInstance().requestBackgroundGeoPermission(this, REQUEST_CODE_BACKGROUND_GEO);
-                    } else {
-                        startGeo();
-                        if (requestCode == REQUEST_CODE_SEND_GEO) {
+
+                    if (requestCode == REQUEST_CODE_SEND_GEO) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                            startGeoOrRequestBackgroundGeoPermission(REQUEST_CODE_BACKGROUND_GEO_SEND_GEO);
+                        } else {
+                            startGeo();
                             DevinoSdk.getInstance().sendCurrentGeo();
                         }
+                    } else {
+                        startGeoOrRequestBackgroundGeoPermission(REQUEST_CODE_BACKGROUND_GEO);
                     }
                 } else {
                     logsCallback.onMessageLogged(getString(R.string.foreground_geo_permission_missing));
@@ -129,7 +133,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityCallb
                 ) {
                     logsCallback.onMessageLogged(getString(R.string.foreground_geo_permission_granted));
                     logsCallback.onMessageLogged(getString(R.string.notification_permission_granted));
-                    startGeoOrRequestBackgroundGeoPermission();
+                    startGeoOrRequestBackgroundGeoPermission(REQUEST_CODE_BACKGROUND_GEO);
                 }
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_DENIED
                         && grantResults[1] == PackageManager.PERMISSION_DENIED
@@ -143,7 +147,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityCallb
                         && grantResults[2] == PackageManager.PERMISSION_DENIED
                 ) {
                     logsCallback.onMessageLogged(getString(R.string.foreground_geo_permission_granted));
-                    startGeoOrRequestBackgroundGeoPermission();
+                    startGeoOrRequestBackgroundGeoPermission(REQUEST_CODE_BACKGROUND_GEO);
                     logsCallback.onMessageLogged(getString(R.string.notification_permission_missing));
                 }
                 if (grantResults.length > 0 && (grantResults[0] == PackageManager.PERMISSION_DENIED
@@ -167,6 +171,15 @@ public class MainActivity extends AppCompatActivity implements MainActivityCallb
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     logsCallback.onMessageLogged(getString(R.string.background_geo_permission_granted));
                     startGeo();
+                } else {
+                    logsCallback.onMessageLogged(getString(R.string.background_geo_permission_missing));
+                }
+            }
+            case REQUEST_CODE_BACKGROUND_GEO_SEND_GEO -> {
+                Log.d(getString(R.string.tag), "5 grantResults=" + Arrays.toString(grantResults));
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    logsCallback.onMessageLogged(getString(R.string.background_geo_permission_granted));
+                    startGeo();
                     DevinoSdk.getInstance().sendCurrentGeo();
                 } else {
                     logsCallback.onMessageLogged(getString(R.string.background_geo_permission_missing));
@@ -175,13 +188,13 @@ public class MainActivity extends AppCompatActivity implements MainActivityCallb
         }
     }
 
-    private void startGeoOrRequestBackgroundGeoPermission() {
+    private void startGeoOrRequestBackgroundGeoPermission(int requestCode) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             new AlertDialog.Builder(this)
                     .setTitle(getString(R.string.background_geo_permission_missing))
                     .setMessage(getString(R.string.background_geo_permission_text))
                     .setPositiveButton(android.R.string.yes, (dialog, which) ->
-                            DevinoSdk.getInstance().requestBackgroundGeoPermission(this, REQUEST_CODE_BACKGROUND_GEO)
+                            DevinoSdk.getInstance().requestBackgroundGeoPermission(this, requestCode)
                     )
                     .setNegativeButton(android.R.string.no, null)
                     .show();
