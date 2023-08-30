@@ -12,3 +12,4 @@
 -keepclassmembers enum * { *; }
 -keep class com.google.android.gms.location.** { *; }
 -keep class com.huawei.hms.location.** { *; }
+-keep class com.devinotele.huaweidevinosdk.sdk.DevinoSdkPushService$PushButton { *; }
