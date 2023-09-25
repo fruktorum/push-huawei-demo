@@ -112,7 +112,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                 logsView.setText(logs);
                 logToCopy = logs;
                 scrollDown(logsScrollView);
-                setButtonEnable(sendPush);
             }
 
             @Override
@@ -140,26 +139,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         logsRx.unsubscribeOn(mainThread());
         onSaveInstanceState(state);
         super.onDestroy();
-    }
-
-    private void setButtonEnable(Button button) {
-        button.setEnabled(true);
-        button.setBackground(
-                ContextCompat.getDrawable(
-                        requireContext(),
-                        R.drawable.ic_button_blue
-                )
-        );
-    }
-
-    private void setButtonDisable(Button button) {
-        button.setEnabled(false);
-        button.setBackground(
-                ContextCompat.getDrawable(
-                        requireContext(),
-                        R.drawable.ic_grey_background
-                )
-        );
     }
 
     private void setUpViews() {
@@ -219,7 +198,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         }
 
         if (v.getId() == R.id.send_push) {
-            setButtonDisable(sendPush);
             try {
 
                 if (ActivityCompat.checkSelfPermission(requireContext(), POST_NOTIFICATIONS)
