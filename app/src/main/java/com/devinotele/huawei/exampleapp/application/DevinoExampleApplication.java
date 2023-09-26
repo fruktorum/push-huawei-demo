@@ -38,8 +38,9 @@ public class DevinoExampleApplication extends Application {
         RxJavaPlugins.setErrorHandler(e -> {
             Log.d(
                     getString(R.string.tag),
-                    getString(R.string.error_rxJavaPlugins) + e.getMessage()
-            );
+                    getString(R.string.error_rxJavaPlugins)
+                            + " "
+                            + e.getMessage());
         });
     }
 }

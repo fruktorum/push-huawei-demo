@@ -278,7 +278,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                     } catch (ApiException ex) {
                         try {
                             logsCallback.onMessageLogged(
-                                    "Copy token -> Push Kit Error: " + ex.getMessage()
+                                    requireContext().getString(R.string.token_copied_error)
+                                            + " "
+                                            + ex.getMessage()
                             );
                         } catch (Throwable error) {
                             error.printStackTrace();

@@ -1,5 +1,7 @@
 package com.devinotele.huawei.exampleapp.network;
 
+import android.util.Log;
+
 import com.devinotele.huawei.exampleapp.BuildConfig;
 
 import okhttp3.OkHttpClient;
@@ -13,12 +15,18 @@ class RetrofitClientInstance {
     private static Retrofit retrofitDevino;
     private static final String DEVINO_PUSH_SERVICE_URL = BuildConfig.DEVINO_PUSH_SERVICE_URL;
     private static OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+    private static volatile String CURRENT_REQUEST_URL = "";
 
+    public String getCurrentRequestUrl() {
+        return CURRENT_REQUEST_URL;
+    }
 
     static Retrofit getRetrofitInstanceForDevinoPush() {
         if (retrofitDevino == null) {
             httpClient.addInterceptor(chain -> {
+                Log.d("DevinoPush", "chain = " + chain);
                 Request original = chain.request();
+                CURRENT_REQUEST_URL = chain.request().url().toString();
                 Request request = original.newBuilder()
                         .header("Authorization", BuildConfig.DEVINO_SEND_API_KEY)
                         .header("Content-Type", "application/json")

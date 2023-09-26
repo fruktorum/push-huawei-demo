@@ -24,12 +24,14 @@ public class RetrofitHelper {
 
     private final DevinoPushApi devinoPushApi;
     private final DevinoLogsCallback callback;
+    private final RetrofitClientInstance retrofitClientInstance;
 
     public RetrofitHelper(DevinoLogsCallback callback) {
         devinoPushApi = RetrofitClientInstance
                 .getRetrofitInstanceForDevinoPush()
                 .create(DevinoPushApi.class);
         this.callback = callback;
+        retrofitClientInstance = new RetrofitClientInstance();
     }
 
     @SuppressLint("CheckResult")
@@ -48,14 +50,14 @@ public class RetrofitHelper {
                 try {
                     String tokenScope = "HCM";
                     String apAppId = confg.getString("client/app_id");
-                    Log.d("DevinoPush", "apAppId = " + apAppId);
+                    Log.d(context.getString(R.string.logs_tag), "apAppId = " + apAppId);
 
                     String token = hmsInstanceId.getToken(apAppId, tokenScope);
-                    Log.d("DevinoPush", "token = " + token);
+                    Log.d(context.getString(R.string.logs_tag), "token = " + token);
 
                     if (TextUtils.isEmpty(token)) return;
                     String message = "Simple push";
-                    Log.d("DevinoPush", token);
+                    Log.d(context.getString(R.string.logs_tag), token);
 
                     HashMap<String, Object> body = new HashMap<>();
                     body.put("platform", "huawei");
@@ -104,7 +106,7 @@ public class RetrofitHelper {
                                 + "://"
                                 + context.getPackageName()
                                 + "/" + R.raw.push_sound;
-                        Log.d("DevinoPush", "sound = " + sound);
+                        Log.d(context.getString(R.string.logs_tag), "sound = " + sound);
                         android.put("sound", sound);
                         // or use method setCustomSound(sound):
                         DevinoSdk.getInstance().setCustomSound(Uri.parse(sound));
@@ -121,19 +123,39 @@ public class RetrofitHelper {
                             .subscribeOn(Schedulers.newThread())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(
-                                    object -> {
-                                        callback.onMessageLogged(object.toString());
-                                        System.out.println(object);
+                                    json -> {
+                                        callback.onMessageLogged(
+                                                context.getString(R.string.push_send)
+                                                        + " "
+                                                        + retrofitClientInstance.getCurrentRequestUrl()
+                                                        + " -> "
+                                                        + json.toString()
+                                        );
+                                        Log.d(context.getString(R.string.logs_tag), json.toString());
                                     },
-                                    Throwable::printStackTrace
+                                    throwable -> {
+                                        callback.onMessageLogged(
+                                                context.getString(R.string.push_not_send)
+                                                        + " "
+                                                        + retrofitClientInstance.getCurrentRequestUrl()
+                                                        + " -> "
+                                                        + throwable.getLocalizedMessage()
+                                        );
+                                        Log.d(context.getString(R.string.logs_tag),
+                                                throwable.getLocalizedMessage()
+                                        );
+                                    }
                             );
                 } catch (ApiException ex) {
-                    try {
-                        callback.onMessageLogged("Demo Send Push Error: " + ex.getMessage());
-                        Log.d("DevinoPush", "Demo Send Push Error: " + ex.getMessage());
-                    } catch (Throwable error) {
-                        error.printStackTrace();
-                    }
+                    callback.onMessageLogged(context.getString(R.string.push_send_error)
+                            + " "
+                            + ex.getMessage()
+                    );
+                    Log.d(context.getString(R.string.logs_tag),
+                            context.getString(R.string.push_send_error)
+                                    + " "
+                                    + ex.getMessage()
+                    );
                 }
             }
         }.start();
