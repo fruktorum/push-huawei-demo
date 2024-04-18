@@ -48,6 +48,8 @@
     <string name="background_geo_permission_granted">Background Geo Permission Granted</string>
     <string name="background_geo_permission_missing">Background Geo Permission Missing</string>
     <string name="background_geo_permission_text">Background Geo Permission is required. In the next step, select "Allow all the time" in the app settings</string>
+    <string name="geo_fine_permission_granted">Geo Fine Permission Granted</string>
+    <string name="geo_coarse_permission_granted">Geo Coarse Permission Granted</string>
     <string name="next">Next</string>
     <string name="may_devino_permission">May Devino SDK take care of that now?</string>
     <string name="send_geo">Send Geo</string>
