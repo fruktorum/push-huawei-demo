@@ -7,7 +7,7 @@
     <string name="device_type">phone</string>
     <string name="user_email">User Email</string>
     <string name="email_hint">email</string>
-    <string name="text_79">+79</string>
+    <string name="symbol_plus">+</string>
     <string name="invalid_phone_or_email">Invalid phone or email</string>
     <string name="user_phone">User Phone</string>
     <string name="skip_registration">Skip registration</string>
@@ -48,6 +48,8 @@
     <string name="background_geo_permission_granted">Background Geo Permission Granted</string>
     <string name="background_geo_permission_missing">Background Geo Permission Missing</string>
     <string name="background_geo_permission_text">Background Geo Permission is required. In the next step, select "Allow all the time" in the app settings</string>
+    <string name="geo_fine_permission_granted">Geo Fine Permission Granted</string>
+    <string name="geo_coarse_permission_granted">Geo Coarse Permission Granted</string>
     <string name="next">Next</string>
     <string name="may_devino_permission">May Devino SDK take care of that now?</string>
     <string name="send_geo">Send Geo</string>
